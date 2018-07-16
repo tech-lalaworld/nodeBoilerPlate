@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const expressWinston = require('express-winston');
@@ -13,7 +12,7 @@ require('winston-daily-rotate-file');
 require('dotenv').config();
 
 // mongodb config
-const dbConfig = require('./config/dbconfig');
+require('./config/db');
 
 // require routes
 const users = require('./routes/users');
@@ -36,22 +35,6 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
   limit: '1mb',
   extended: true
 }));
-
-// Mongoose connection
-mongoose.Promise = global.Promise;
-mongoose.connect(dbConfig.url, { useNewUrlParser: true })
-  .then(() => {
-    winston.info('database connected successfully');
-  })
-  .catch((err) => {
-    winston.error(err);
-  });
-
-mongoose.connection.on('error', (err) => {
-  winston.error(err);
-  winston.info('%s MongoDB connection error. Please make sure MongoDB is running.');
-  process.exit();
-});
 
 // Using CORS
 app.use(cors());
