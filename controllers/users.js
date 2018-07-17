@@ -1,5 +1,5 @@
-const joi = require('joi');
 const dummyInfo = require('../models/users');
+// const Joi = require('utils/joiTest');
 
 const getInfo = async(req, res) => {
   try{

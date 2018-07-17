@@ -48,6 +48,8 @@ const generateToken = (req, res, next) => {
 
 // sends csrf and jwt tokens
 const getTokens = (req, res) => {
+  res.cookie('XSRF-TOKEN', req.csrfToken());
+  res.locals.csrftoken = req.csrfToken();
   res.status(200).json({
     msg: 'welcome to node boiler plate',
     csrfToken: req.csrfToken(),

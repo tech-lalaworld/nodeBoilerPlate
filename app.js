@@ -85,7 +85,7 @@ app.use(cookieParser());
 app.use(csrf({ cookie: true }));
 
 // Router Initialization
-app.use('/api', users);
+app.use(users);
 
 module.exports = app;
 
