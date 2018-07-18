@@ -10,11 +10,10 @@ const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Node boilerplate Testing', () => {
-
   describe('Testing for welcome message', () => {
     it('it should GET a welcome message', (done) => {
       chai.request(server)
-        .get('/api/')
+        .get('/')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
@@ -31,7 +30,7 @@ describe('Node boilerplate Testing', () => {
     let csrfToken = '';
     beforeEach(function(done) {
       chai.request(server)
-        .get('/api/')
+        .get('/')
         .end(function(err, res) {
           let result = JSON.parse(res.text);
           jwtToken = result.jwt;
@@ -42,7 +41,7 @@ describe('Node boilerplate Testing', () => {
 
     it('it returns info of users', () => {
       chai.request(server)
-        .get('/api/show')
+        .get('/show')
         .set('Authorization', `Bearer ${jwtToken}`)
         .set('X-XCSRF-TOKEN', csrfToken)
         .type('json')
