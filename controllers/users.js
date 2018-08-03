@@ -1,12 +1,12 @@
 const dummyInfo = require('../models/users');
-// const Joi = require('utils/joiTest');
+// const Joi = require('./utils/joiTest');
 
-const getInfo = async(req, res) => {
-  try{
-    const usrInfo = await dummyInfo.find({});
-    if(usrInfo === null) {
-      res.status(404).json({
-        msg: 'no user in the data base',
+const getInfo = (req, res, next) => {
+  dummyInfo.findById('')
+  .then(usr => {
+    if(!usr) {
+      return res.status(404).json({
+        msg: 'No such user in the record',
       });
     }
 
@@ -14,27 +14,27 @@ const getInfo = async(req, res) => {
       msg: 'info found successfully',
       result: usrInfo,
     });
-  } catch(err){
-    res.status(400).json({
-      msg: 'Error in fetching user Info',
-      result: err,
-    });
-  }
+
+  })
+  .catch(err => {
+    err.msgToClient = 'Error in fetching user Info';
+    err.status = 404;
+    next(err);
+  });
 };
 
 const updateInfo = async(req, res) => {
   Joi.validate(req.info, Joi.string().required().min(10));
   try {
-    const updatedUsr = dummyInfo.findOne({ email: req.body.email });
+    const updatedUsr = await dummyInfo.findOne({ email: req.body.email });
     res.status(200).json({
       msg: 'user info updated successfully',
       result: updatedUsr.info,
     });
   } catch(err) {
-    res.status(401).json({
-      msg: 'Unauthorized access',
-      result: err,
-    });
+    err.status = 401;
+    err.msgToClient = 'Unauthorised Access';
+    next(err);
   }
 };
 
@@ -49,10 +49,9 @@ const addInfo = async(req, res) => {
       result: newUser,
     });
   } catch(err) {
-    res.status(400).json({
-      msg: 'error while updating user',
-      result: err,
-    });
+    err.status = 400;
+    err.msgToClient = 'Error while updating user';
+    next(err);
   }
 };
 
