@@ -97,3 +97,5 @@ app.listen(process.env.PORT, process.env.HOST, () => {
 module.exports = app;
 
 process.on('uncaughtException', errHndlr.handleUncaughtExceptions);
+
+process.on('unhandledRejection', errHndlr.handleUncaughtExceptions);
