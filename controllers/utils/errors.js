@@ -1,5 +1,6 @@
+const winston = require('winston');
 const logError = (err, req, res, next) => {
-  console.error(err.stack);
+  winston.error(err.stack);
   next(err);
 }
 
@@ -8,12 +9,13 @@ const errorHandler = (err, req, res, next) => {
 }
 
 const handleUncaughtExceptions = (error = {}) => {
+  // Should Perform graceful shutdown of server
   if (error.message != null) {
-    console.log(error.message)
+    winston.log(error.message)
   }
 
   if (error.stack != null) {
-    console.log(error.stack)
+    winston.log(error.stack)
   }
 }
 

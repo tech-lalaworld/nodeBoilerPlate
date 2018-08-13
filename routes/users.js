@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/', jwtToken.generateToken, jwtToken.getTokens);
 
-// router.use(jwtToken.setToken, jwtToken.verifyToken);
+router.use(jwtToken.setToken, jwtToken.verifyToken);
 
 router.get('/show', user.getInfo);
 router.post('/insert', user.addInfo);
