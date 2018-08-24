@@ -2,21 +2,28 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-  info: {
+  username: {
+    type: String,
+    unique: true
+  },
+  password: {
     type: String
   },
-  updateAt: { type: Date, default: Date.now }
+  location: {
+    type: String
+  },
+  lastUpdateAt: { type: Date, default: Date.now }
 });
 
 UserSchema.pre('save', function (next) {
   let data = this;
-  data.info = data.info.toUpper();
+  data.location = data.location.toUpperCase();
   next();
 });
 
 UserSchema.post('save', function() {
   let data = this;
-  data.updatedAt = new Date();
+  data.lastUpdateAt = new Date();
 });
 
-module.exports = mongoose.model('dummyInfo', UserSchema);
+module.exports = mongoose.model('User', UserSchema);
