@@ -88,9 +88,3 @@ app.use(csrf({ cookie: true }));
 app.use(users);
 
 module.exports = app;
-
-// Server Initialization
-app.listen(process.env.PORT, process.env.HOST, () => {
-  winston.info(`Server started on ${new Date()}`);
-  winston.info(`server is running at http://${process.env.HOST}:${process.env.PORT}`);
-});
