@@ -8,6 +8,7 @@ const expressWinston = require('express-winston');
 const csrf = require('csurf');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const errHndlr = require('./controllers/utils/errors');
 require('winston-daily-rotate-file');
 require('dotenv').config();
 
@@ -87,10 +88,14 @@ app.use(csrf({ cookie: true }));
 // Router Initialization
 app.use(users);
 
-module.exports = app;
-
 // Server Initialization
 app.listen(process.env.PORT, process.env.HOST, () => {
   winston.info(`Server started on ${new Date()}`);
   winston.info(`server is running at http://${process.env.HOST}:${process.env.PORT}`);
 });
+
+module.exports = app;
+
+process.on('uncaughtException', errHndlr.handleUncaughtExceptions);
+
+process.on('unhandledRejection', errHndlr.handleUncaughtExceptions);
