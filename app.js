@@ -82,7 +82,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // csurf config
-app.use(csrf({ cookie: true }));
+// app.use(csrf({ cookie: true }));
 
 // Router Initialization
 app.use(users);

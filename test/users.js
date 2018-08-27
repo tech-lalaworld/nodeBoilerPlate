@@ -17,38 +17,74 @@ describe('Node boilerplate Testing', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
-          res.body.should.have.property('csrfToken');
-          res.body.should.have.property('jwt');
-          res.body.msg.should.eql('welcome to node boiler plate');
+          res.body.msg.should.eql('Welcome to Node BoilerPlate');
           done();
         });
     });
   });
 
-  describe('Testing for get info route', () => {
-    let jwtToken = '';
-    let csrfToken = '';
+  // describe('Testing for Registering User', () => {
+  //   it('it registers a new user', (done) => {
+  //     chai.request(server)
+  //       .post('/register')
+  //       .send({
+  //         username: 'john',
+  //         password: 'doe',
+  //         location: 'Tokyo'
+  //       })
+  //       .end((err, res) => {
+  //         res.should.have.status(201);
+  //         res.body.should.be.a('object');
+  //         res.body.msg.should.eql('User successfuly registered');
+  //         done();
+  //       });
+  //   });
+  // });
+
+
+
+  describe('Testing for update and get user info', () => {
+    // let jwtToken = '';
     beforeEach(function(done) {
       chai.request(server)
-        .get('/')
+        .post('/login')
+        .send({
+          username: 'john',
+          password: 'doe'
+        })
         .end(function(err, res) {
           let result = JSON.parse(res.text);
-          jwtToken = result.jwt;
-          csrfToken = result.csrfToken;
+          jwtToken = result.token;
           done();
         });
     });
 
-    it('it returns info of users', () => {
+    it('it updates user info', () => {
       chai.request(server)
-        .get('/show')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .set('X-XCSRF-TOKEN', csrfToken)
+        .get('/update')
+        .set('Authorization', `bearer ${jwtToken}`)
         .type('json')
-        .send('{"info": "test info"}')
+        .send({
+          username: 'john',
+          location: 'Ghaziabad'
+        })
         .end(function(err, res) {
           if (err) return done(err);
-          res.body.should.be.a('array');
+          res.body.should.be.a('object');
+          res.body.should.have.property('result');
+          done();
+        });
+    });
+
+    it('it returns info of user', () => {
+      chai.request(server)
+        .get('/john')
+        .set('Authorization', `bearer ${jwtToken}`)
+        .type('json')
+        .end(function(err, res) {
+          if (err) return done(err);
+          res.body.should.be.a('object');
+          res.body.should.have.property('result');
           done();
         });
     });

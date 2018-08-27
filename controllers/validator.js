@@ -1,8 +1,21 @@
 const {
+  ValidateLogin,
   ValidateRegister,
   ValidateGetUser,
   ValidateUpdateUser
 } = require('../config/validatorSchema');
+
+const login = (req, res, next) => {
+  const {error, value} = ValidateLogin.validate(req.body);
+  if(error) {
+    res.status(400).json({
+      msg: 'Inputs do not meet format'
+    });
+  } else {
+    req.parsed = value;
+    next();
+  }
+};
 
 const register = (req, res, next) => {
   const {error, value} = ValidateRegister.validate(req.body);
@@ -35,12 +48,13 @@ const updateUser = (req, res, next) => {
       msg: 'Inputs do not meet format'
     });
   } else {
-    req.params = value;
+    req.parsed = value;
     next();
   }
 };
 
 exports = module.exports = {
+  login,
   register,
   getUser,
   updateUser

@@ -1,11 +1,69 @@
 const User = require('../models/users');
+const jwt = require('jsonwebtoken');
+
+const sendToken = (req, res) => {
+  jwt.sign({ foo: 'bar' }, process.env.SECRET, { expiresIn: '1200s' }, (err, token) => {
+    if(err) {
+      res.status(400).json({
+        result: 'Could not login'
+      });
+    }
+    res.status(200).json({token});
+  });
+};
+
+const verifyToken = (req, res, next) => {
+  let token = null;
+  const bearerHeader = req.headers.authorization;
+  // check if bearer is undefined
+  if (typeof bearerHeader !== 'undefined') {
+    // Split at space
+    const bearer = bearerHeader.split(' ');
+    // get token from array
+    const bearerToken = bearer[1];
+    // set the token
+    token = bearerToken;
+  } else {
+    // Forbidden
+    res.status(403).json({
+      msg: 'forbidden'
+    });
+  }
+  
+  jwt.verify(token, process.env.SECRET, (err) => {
+    if(err) {
+      return res.status(403).json({msg: 'forbidden'});
+    }
+    next();
+  });
+};
+
+const login = async(req, res, next) => {
+  const username = req.parsed.username;
+  let foundUser = null;
+  
+  try {
+    foundUser = await User.findOne({username});    
+  } catch (error) {
+    return res.status(404).json({
+      msg: 'Username or password do not match'
+    });
+  }
+
+  if(foundUser === null || foundUser.password !== req.parsed.password) {
+    return res.status(404).json({
+      msg: 'Username or password do not match'
+    });
+  }
+  next();
+};
 
 const getUser = async(req, res) => {
   const username = req.params.username;
   try{
     const user = await User.findOne({username});
     if(user === null) {
-      res.status(404).json({
+      return res.status(404).json({
         msg: 'no user in the data base',
       });
     }
@@ -43,7 +101,7 @@ const register = async (req, res) => {
 };
 
 const update = async(req, res) => {
-  const username = req.body.username;
+  const username = req.parsed.username;
   let user = null;
   try {
     user = await User.findOne({username});
@@ -62,7 +120,7 @@ const update = async(req, res) => {
   try {
     await user.save();
     res.status(200).json({
-      msg: 'User successfuly registered',
+      msg: 'User successfuly updated',
       user: {
         location: user.location
       }
@@ -74,27 +132,11 @@ const update = async(req, res) => {
   }
 };
 
-const addInfo = async(req, res) => {
-  const { info } = req.body;
-  const userId = req.decoded;
-  Joi.validate(req.info, Joi.string().required().min(10));
-  try {
-    const newUser = await User.findByIdAndUpdate(userId, { info }, { new: true });
-    res.status(201).json({
-      msg: 'user added successfully',
-      result: newUser,
-    });
-  } catch(err) {
-    res.status(400).json({
-      msg: 'error while updating user',
-      result: err,
-    });
-  }
-};
-
 module.exports = {
+  login,
   getUser,
-  addInfo,
   update,
-  register
+  register,
+  sendToken,
+  verifyToken
 };
