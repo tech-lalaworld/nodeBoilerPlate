@@ -5,7 +5,7 @@
 The **Node Boilerplate** exposes a well documented [JSON:API Spec](http://jsonapi.org/) Compliant `REST API` that can be used by external services to access & manipulate the data.
 
 **API Documentation:**
--  A hosted version of the **API docs** is available <postman docs link>
+-  A postman collection of the API requests is available at https://www.getpostman.com/collections/c0bf860e4d4442dcb504
 
 ## Technology Stack
 
@@ -26,9 +26,7 @@ install npm modules: `npm install`
 ### Running the API
 * use command `npm start` to start the api
 * using API testing tools like postman hit the endpoint `localhost:3000/`
-* after that you will get a [CSRF](https://www.npmjs.com/package/csurf) token and a [JWT](https://jwt.io/) token.
-* use `CSRF` token with subsequent request in `X-XCSRF-TOKEN` header.
-* use `JWT` token with subsequent request in `Authorization` header as `Bearer <JWT>`.
+* Route for updating user is authenticated. The `jwt` token obtained after login needs to sent in the authorisation header.
 
 ### External Service Dependencies
 

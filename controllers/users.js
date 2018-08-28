@@ -1,18 +1,79 @@
-const dummyInfo = require('../models/users');
-// const Joi = require('./utils/joiTest');
+const User = require('../models/users');
+const jwt = require('jsonwebtoken');
 
-const getInfo = (req, res, next) => {
-  dummyInfo.findById('')
-  .then(usr => {
-    if(!usr) {
+const sendToken = (req, res) => {
+  jwt.sign({ foo: 'bar' }, process.env.SECRET, { expiresIn: '1200s' }, (err, token) => {
+    if(err) {
+      res.status(400).json({
+        result: 'Could not login'
+      });
+    }
+    res.status(200).json({token});
+  });
+};
+
+const verifyToken = (req, res, next) => {
+  let token = null;
+  const bearerHeader = req.headers.authorization;
+  // check if bearer is undefined
+  if (typeof bearerHeader !== 'undefined') {
+    // Split at space
+    const bearer = bearerHeader.split(' ');
+    // get token from array
+    const bearerToken = bearer[1];
+    // set the token
+    token = bearerToken;
+  } else {
+    // Forbidden
+    res.status(403).json({
+      msg: 'forbidden'
+    });
+  }
+  
+  jwt.verify(token, process.env.SECRET, (err) => {
+    if(err) {
+      return res.status(403).json({msg: 'forbidden'});
+    }
+    next();
+  });
+};
+
+const login = async(req, res, next) => {
+  const username = req.parsed.username;
+  let foundUser = null;
+  
+  try {
+    foundUser = await User.findOne({username});    
+  } catch (error) {
+    return res.status(404).json({
+      msg: 'Username or password do not match'
+    });
+  }
+
+  if(foundUser === null || foundUser.password !== req.parsed.password) {
+    return res.status(404).json({
+      msg: 'Username or password do not match'
+    });
+  }
+  next();
+};
+
+const getUser = async(req, res) => {
+  const username = req.params.username;
+  try{
+    const user = await User.findOne({username});
+    if(user === null) {
       return res.status(404).json({
-        msg: 'No such user in the record',
+        msg: 'no user in the data base',
       });
     }
 
     res.status(200).json({
-      msg: 'info found successfully',
-      result: usrInfo,
+      msg: 'User found successfully',
+      result: {
+        username,
+        location: user.location
+      }
     });
 
   })
@@ -23,40 +84,60 @@ const getInfo = (req, res, next) => {
   });
 };
 
-const updateInfo = async(req, res) => {
-  Joi.validate(req.info, Joi.string().required().min(10));
+const register = async (req, res) => {
+  const user = new User();
+  user.username = req.parsed.username;
+  user.password = req.parsed.password;
+  user.location = req.parsed.location;
   try {
-    const updatedUsr = await dummyInfo.findOne({ email: req.body.email });
-    res.status(200).json({
-      msg: 'user info updated successfully',
-      result: updatedUsr.info,
+    await user.save();
+    res.status(201).json({
+      msg: 'User successfuly registered'
     });
-  } catch(err) {
-    err.status = 401;
-    err.msgToClient = 'Unauthorised Access';
-    next(err);
+  } catch (error) {
+    res.status(406).json({
+      msg: 'Could not register user'
+    });
   }
 };
 
-const addInfo = async(req, res) => {
-  const { info } = req.body;
-  const userId = req.decoded;
-  Joi.validate(req.info, Joi.string().required().min(10));
+const update = async(req, res) => {
+  const username = req.parsed.username;
+  let user = null;
   try {
-    const newUser = await dummyInfo.findByIdAndUpdate(userId, { info }, { new: true });
-    res.status(201).json({
-      msg: 'user added successfully',
-      result: newUser,
+    user = await User.findOne({username});
+  } catch (error) {
+    res.status(400).json({
+      msg: 'Some error occurred'
     });
-  } catch(err) {
-    err.status = 400;
-    err.msgToClient = 'Error while updating user';
-    next(err);
+  }
+  if(user === null) {
+    return res.status(404).json({
+      msg: 'User not found'
+    });
+  }
+
+  user.location = req.body.location;
+  try {
+    await user.save();
+    res.status(200).json({
+      msg: 'User successfuly updated',
+      user: {
+        location: user.location
+      }
+    });
+  } catch (error) {
+    res.status(406).json({
+      msg: 'Could not update user'
+    });
   }
 };
 
 module.exports = {
-  getInfo,
-  addInfo,
-  updateInfo,
+  login,
+  getUser,
+  update,
+  register,
+  sendToken,
+  verifyToken
 };

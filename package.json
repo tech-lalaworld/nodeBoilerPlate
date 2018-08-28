@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha",
-    "start": "node app.js",
+    "test": "mocha --timeout 5000",
+    "start": "nodemon bin/www",
     "coverage": "istanbul cover _mocha"
   },
   "keywords": [],

@@ -83,19 +83,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // csurf config
-app.use(csrf({ cookie: true }));
+// app.use(csrf({ cookie: true }));
 
 // Router Initialization
 app.use(users);
 
-// Server Initialization
-app.listen(process.env.PORT, process.env.HOST, () => {
-  winston.info(`Server started on ${new Date()}`);
-  winston.info(`server is running at http://${process.env.HOST}:${process.env.PORT}`);
-});
-
 module.exports = app;
 
-process.on('uncaughtException', errHndlr.handleUncaughtExceptions);
-
-process.on('unhandledRejection', errHndlr.handleUncaughtExceptions);
