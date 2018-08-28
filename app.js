@@ -8,6 +8,7 @@ const expressWinston = require('express-winston');
 const csrf = require('csurf');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const errHndlr = require('./controllers/utils/errors');
 require('winston-daily-rotate-file');
 require('dotenv').config();
 
@@ -88,3 +89,4 @@ app.use(cookieParser());
 app.use(users);
 
 module.exports = app;
+

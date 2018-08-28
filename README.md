@@ -42,6 +42,9 @@ Test are written using [Mocha](https://mochajs.org/) and [Chai](http://www.chaij
 #### Running test cases
 use the command `npm test` to run test cases. **(Please make sure all test cases pass before pushing your code)**
 
+## Error Handling
+All the errors handling inside a middleware should be performed by setting the `status` code and the `msgToCLient` property of the `error` object and passing it to the next middleware.
+
 ## Logging
 
 Node Boilerplate uses [winston](https://github.com/winstonjs/winston#readme) for error and warning logs.

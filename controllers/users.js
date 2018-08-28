@@ -75,12 +75,13 @@ const getUser = async(req, res) => {
         location: user.location
       }
     });
-  } catch(err){
-    res.status(400).json({
-      msg: 'Error in fetching user Info',
-      result: err,
-    });
-  }
+
+  })
+  .catch(err => {
+    err.msgToClient = 'Error in fetching user Info';
+    err.status = 404;
+    next(err);
+  });
 };
 
 const register = async (req, res) => {
