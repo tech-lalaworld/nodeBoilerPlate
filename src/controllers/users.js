@@ -76,12 +76,12 @@ const getUser = async(req, res) => {
       }
     });
 
-  })
-  .catch(err => {
+  }
+  catch(err) {
     err.msgToClient = 'Error in fetching user Info';
     err.status = 404;
     next(err);
-  });
+  }
 };
 
 const register = async (req, res) => {

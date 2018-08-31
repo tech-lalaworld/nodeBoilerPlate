@@ -3,7 +3,7 @@ const {
   ValidateRegister,
   ValidateGetUser,
   ValidateUpdateUser
-} = require('../config/validatorSchema');
+} = require('../../config/validatorSchema');
 
 const login = (req, res, next) => {
   const {error, value} = ValidateLogin.validate(req.body);

@@ -8,7 +8,7 @@ const expressWinston = require('express-winston');
 const csrf = require('csurf');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const errHndlr = require('./controllers/utils/errors');
+const errHndlr = require('./src/utils/errors');
 require('winston-daily-rotate-file');
 require('dotenv').config();
 
@@ -16,7 +16,7 @@ require('dotenv').config();
 require('./config/db');
 
 // require routes
-const users = require('./routes/users');
+const users = require('./src/routes/users');
 
 // Initializing express app
 const app = express();
@@ -86,7 +86,12 @@ app.use(cookieParser());
 // app.use(csrf({ cookie: true }));
 
 // Router Initialization
-app.use(users);
+app.get('/v2', (req, res) => {
+  res.status(200).json({
+    msg: 'Welcome to Node BoilerPlate v2.0'
+  });
+});
+app.use('/v2/user', users);
 
 module.exports = app;
 
