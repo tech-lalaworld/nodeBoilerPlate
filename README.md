@@ -1,4 +1,4 @@
-# Node Boilerplate
+# Node Boilerplate v1.0
 
 > **Starter code for node/express based API**
 
