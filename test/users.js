@@ -13,11 +13,11 @@ describe('Node boilerplate Testing', () => {
   describe('Testing for welcome message', () => {
     it('it should GET a welcome message', (done) => {
       chai.request(server)
-        .get('/')
+        .get('/v2')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
-          res.body.msg.should.eql('Welcome to Node BoilerPlate');
+          res.body.msg.should.eql('Welcome to Node BoilerPlate v2.0');
           done();
         });
     });
@@ -44,13 +44,13 @@ describe('Node boilerplate Testing', () => {
 
 
   describe('Testing for update and get user info', () => {
-    // let jwtToken = '';
+    let jwtToken = '';
     beforeEach(function(done) {
       chai.request(server)
-        .post('/login')
+        .post('/v2/user/login')
         .send({
-          username: 'john',
-          password: 'doe'
+          username: 'neo',
+          password: 'adams'
         })
         .end(function(err, res) {
           let result = JSON.parse(res.text);
@@ -61,12 +61,12 @@ describe('Node boilerplate Testing', () => {
 
     it('it updates user info', () => {
       chai.request(server)
-        .get('/update')
+        .get('/v2/user/update')
         .set('Authorization', `bearer ${jwtToken}`)
         .type('json')
         .send({
-          username: 'john',
-          location: 'Ghaziabad'
+          username: 'neo',
+          location: 'surrey'
         })
         .end(function(err, res) {
           if (err) return done(err);
@@ -78,7 +78,7 @@ describe('Node boilerplate Testing', () => {
 
     it('it returns info of user', () => {
       chai.request(server)
-        .get('/john')
+        .get('/v2/user/neo')
         .set('Authorization', `bearer ${jwtToken}`)
         .type('json')
         .end(function(err, res) {
