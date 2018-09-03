@@ -1,19 +1,16 @@
 const express = require('express');
 const user = require('../controllers/users');
 const validate = require('../controllers/validator');
-
+const { errorHandler } = require('../middlewares/errors');
 const router = express.Router();
-
-router.get('/', (req, res) => {
-  res.status(200).json({
-    msg: 'Welcome to Node BoilerPlate'
-  });
-});
+const jwt = require('../middlewares/jwt');
 
 router.get('/:username', validate.getUser, user.getUser);
 router.post('/register', validate.register, user.register);
 
-router.post('/login', validate.login, user.login, user.sendToken);
-router.put('/update', user.verifyToken, validate.updateUser, user.update);
+router.post('/login', validate.login, user.login, jwt.sendToken);
+router.put('/update', jwt.verifyToken, validate.updateUser, user.update);
+
+router.use(errorHandler);
 
 module.exports = router;
