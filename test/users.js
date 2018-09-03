@@ -44,13 +44,13 @@ describe('Node boilerplate Testing', () => {
 
 
   describe('Testing for update and get user info', () => {
-    // let jwtToken = '';
+    let jwtToken = '';
     beforeEach(function(done) {
       chai.request(server)
         .post('/v2/user/login')
         .send({
-          username: 'emilia',
-          password: 'rose'
+          username: 'neo',
+          password: 'adams'
         })
         .end(function(err, res) {
           let result = JSON.parse(res.text);
@@ -65,8 +65,8 @@ describe('Node boilerplate Testing', () => {
         .set('Authorization', `bearer ${jwtToken}`)
         .type('json')
         .send({
-          username: 'john',
-          location: 'Ghaziabad'
+          username: 'neo',
+          location: 'surrey'
         })
         .end(function(err, res) {
           if (err) return done(err);
@@ -78,7 +78,7 @@ describe('Node boilerplate Testing', () => {
 
     it('it returns info of user', () => {
       chai.request(server)
-        .get('/v2/user/john')
+        .get('/v2/user/neo')
         .set('Authorization', `bearer ${jwtToken}`)
         .type('json')
         .end(function(err, res) {
