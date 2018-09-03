@@ -1,26 +1,55 @@
-const winston = require('winston');
-const logError = (err, req, res, next) => {
-  winston.error(err.stack);
-  next(err);
-}
-
-const errorHandler = (err, req, res, next) => {
-  res.status(err.status || 400).json({ msg: err.msgToClient || 'Something went wrong'});
-}
-
-const handleUncaughtExceptions = (error = {}) => {
-  // Should Perform graceful shutdown of server
-  if (error.message != null) {
-    winston.log(error.message)
-  }
-
-  if (error.stack != null) {
-    winston.log(error.stack)
+class ValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ValidationError';
+    this.message = message;
   }
 }
+class PermissionError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'PermissionError';
+    this.message = message;
+  }
+}
+class AuthorizationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'AuthorizationError';
+    this.message = message;
+  }
+}
 
-exports = module.exports = {
-  logError,
-  errorHandler,
-  handleUncaughtExceptions
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'NotFoundError';
+    this.message = message;
+  }
+}
+
+class DatabaseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'DatabaseError';
+    this.message = message;
+  }
+}
+
+class OperationalError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'OperationalError';
+    this.message = message;
+  }
+}
+
+
+module.exports = {
+  ValidationError,
+  PermissionError,
+  AuthorizationError,
+  DatabaseError,
+  NotFoundError,
+  OperationalError
 }

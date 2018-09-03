@@ -1,59 +1,24 @@
 const User = require('../models/users');
-const jwt = require('jsonwebtoken');
-
-const sendToken = (req, res) => {
-  jwt.sign({ foo: 'bar' }, process.env.SECRET, { expiresIn: '1200s' }, (err, token) => {
-    if(err) {
-      res.status(400).json({
-        result: 'Could not login'
-      });
-    }
-    res.status(200).json({token});
-  });
-};
-
-const verifyToken = (req, res, next) => {
-  let token = null;
-  const bearerHeader = req.headers.authorization;
-  // check if bearer is undefined
-  if (typeof bearerHeader !== 'undefined') {
-    // Split at space
-    const bearer = bearerHeader.split(' ');
-    // get token from array
-    const bearerToken = bearer[1];
-    // set the token
-    token = bearerToken;
-  } else {
-    // Forbidden
-    res.status(403).json({
-      msg: 'forbidden'
-    });
-  }
-  
-  jwt.verify(token, process.env.SECRET, (err) => {
-    if(err) {
-      return res.status(403).json({msg: 'forbidden'});
-    }
-    next();
-  });
-};
+const {
+  ValidationError,
+  PermissionError,
+  AuthorizationError,
+  DatabaseError,
+  NotFoundError,
+  OperationalError
+} = require('../utils/errors');
 
 const login = async(req, res, next) => {
   const username = req.parsed.username;
   let foundUser = null;
-  
   try {
     foundUser = await User.findOne({username});    
   } catch (error) {
-    return res.status(404).json({
-      msg: 'Username or password do not match'
-    });
+    return next(new AuthorizationError('Username or password do not match'));
   }
 
   if(foundUser === null || foundUser.password !== req.parsed.password) {
-    return res.status(404).json({
-      msg: 'Username or password do not match'
-    });
+    return next(new NotFoundError('Username or password do not match'));
   }
   next();
 };
@@ -63,9 +28,7 @@ const getUser = async(req, res) => {
   try{
     const user = await User.findOne({username});
     if(user === null) {
-      return res.status(404).json({
-        msg: 'no user in the data base',
-      });
+      return next(new NotFoundError('No user in the database'));
     }
 
     res.status(200).json({
@@ -75,12 +38,8 @@ const getUser = async(req, res) => {
         location: user.location
       }
     });
-
-  }
-  catch(err) {
-    err.msgToClient = 'Error in fetching user Info';
-    err.status = 404;
-    next(err);
+  } catch(err) {
+    next(new DatabaseError('Error in fetching user Info'));
   }
 };
 
@@ -95,9 +54,7 @@ const register = async (req, res) => {
       msg: 'User successfuly registered'
     });
   } catch (error) {
-    res.status(406).json({
-      msg: 'Could not register user'
-    });
+    next(new DatabaseError('Error in fetching user Info'));
   }
 };
 
@@ -112,9 +69,7 @@ const update = async(req, res) => {
     });
   }
   if(user === null) {
-    return res.status(404).json({
-      msg: 'User not found'
-    });
+    return next(new NotFoundError('No user in the database'));
   }
 
   user.location = req.body.location;
@@ -127,9 +82,7 @@ const update = async(req, res) => {
       }
     });
   } catch (error) {
-    res.status(406).json({
-      msg: 'Could not update user'
-    });
+    next(new DatabaseError('Could not update User'));
   }
 };
 
@@ -137,7 +90,5 @@ module.exports = {
   login,
   getUser,
   update,
-  register,
-  sendToken,
-  verifyToken
+  register
 };
